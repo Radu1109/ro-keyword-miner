@@ -1,0 +1,111 @@
+# RO Keyword Miner
+
+Un mic tool în Python care:
+1) caută pe Google (via Serper) pentru o sintagmă,
+2) descarcă paginile găsite, extrage textul util,
+3) curăță conținutul (url/email/JS/numere/stopwords),
+4) numără cele mai frecvente cuvinte și bigrame,
+5) îți permite să întrebi “de câte ori apare X” (unigramă sau bigramă).
+
+## Demo (pe scurt)
+- Input: `Accidente rutiere în România` (2 pagini de rezultate)
+- Output: top unigrame/bigrame + sursele folosite
+- Interogare: `accidente rutiere` → contorul bigramei
+
+---
+
+## De ce există
+E un MVP pentru mining rapid de “keywords” din articole românești, util pentru research, SEO inițial sau “feeling” despre un subiect. Fără ML greu, doar igienă, extragere și numărătoare onestă.
+
+---
+
+## Features
+- Căutare Google prin [Serper.dev]
+- Fetch cu retry & timeout (httpx)
+- Extract text robust (trafilatura)
+- Filtrare: URL/email/tag-uri JS/numere/stopwords RO
+- Top unigrame + bigrame
+- Interogare termen: unigramă / bigramă (“accidente rutiere”)
+- Listă de surse (linkuri + domenii)
+
+---
+
+## Cerințe
+- Python 3.11+ (recomandat 3.12)
+- Windows/macOS/Linux
+
+---
+
+## Setup (Windows exemplu)
+
+```bash
+# 1) Clone
+git clone https://github.com/<user>/<repo>.git
+cd <repo>
+
+# 2) Venv
+python -m venv .venv
+.\.venv\Scripts\activate
+
+# 3) Instalează dependențele
+pip install -r requirements.txt
+
+Dacă n-ai requirements.txt, generează-l din venv:
+
+pip freeze > requirements.txt
+
+Config (.env)
+
+Creează un fișier .env în rădăcina proiectului:
+
+SERPER_API_KEY=PASTE_CHEIA_TA_AICI
+
+Programul te întreabă:
+
+Search: sintagma de căutat (ex. Accidente rutiere in Romania)
+
+How many pages to search: nr. pagini Serper (ex. 2)
+
+După ce procesează, îți cere opțional un Specific word:
+
+un cuvânt (unigramă), ex. accidente
+
+două cuvinte (bigramă), ex. accidente rutiere
+
+Ce afișează
+
+Top unigrame: cuvânt - count
+
+Top bigrame: cuvânt1 cuvânt2 - count
+
+Surse folosite: URL-urile de unde s-a extras text
+
+Exemplu de interogare:
+
+Specific word:
+accidente rutiere
+'accidente rutiere': 12
+
+Parametri interni / note utile
+
+Serper: results_num (5–10) și pages (max 5 recomandat pentru MVP)
+
+Retry & backoff: pe 429/5xx (0.8s, 1.6s, 3.2s)
+
+extract_main_text: prag minim ~500 caractere (ajustează după nevoie)
+
+text_filter: regex + STOPWORDS_RO (grupate pe categorii), păstrează doar [a-zăâîșț]+, len>=3
+
+Numărări:
+
+unigrame → Counter total
+
+bigrame → Counter din perechi consecutive după filtrare
+
+Interogare termen:
+
+1 cuvânt → din total_counter
+
+2 cuvinte → din bigram_counter[(w1, w2)]
+
+(pentru >2 cuvinte: poți implementa n-gram “on the fly” cu fereastră)

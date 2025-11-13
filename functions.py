@@ -114,7 +114,7 @@ def get_serper_page(query: str, page: int, api_key: str) -> list[str]:
     links = []
     request_dict= {
     "q": query,
-    "results_num": 5, #->Rezultate pe o singura pagina
+    "results_num": 10, #->Rezultate pe o singura pagina
     "page": page,
     "gl": "ro",
     "hl": "ro"
