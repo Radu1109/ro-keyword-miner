@@ -1,111 +1,101 @@
 # RO Keyword Miner
 
-Un mic tool în Python care:
-1) caută pe Google (via Serper) pentru o sintagmă,
-2) descarcă paginile găsite, extrage textul util,
-3) curăță conținutul (url/email/JS/numere/stopwords),
-4) numără cele mai frecvente cuvinte și bigrame,
-5) îți permite să întrebi “de câte ori apare X” (unigramă sau bigramă).
-
-## Demo (pe scurt)
-- Input: `Accidente rutiere în România` (2 pagini de rezultate)
-- Output: top unigrame/bigrame + sursele folosite
-- Interogare: `accidente rutiere` → contorul bigramei
-
----
-
-## De ce există
-E un MVP pentru mining rapid de “keywords” din articole românești, util pentru research, SEO inițial sau “feeling” despre un subiect. Fără ML greu, doar igienă, extragere și numărătoare onestă.
-
----
+Un tool Python pentru mining și analiza de keywords din articole românești și în engleză.
 
 ## Features
-- Căutare Google prin [Serper.dev]
-- Fetch cu retry & timeout (httpx)
-- Extract text robust (trafilatura)
-- Filtrare: URL/email/tag-uri JS/numere/stopwords RO
-- Top unigrame + bigrame
-- Interogare termen: unigramă / bigramă (“accidente rutiere”)
-- Listă de surse (linkuri + domenii)
 
----
+### Layer 1 - Keyword Extraction
+- Căutare Google via Serper API
+- Extragere text robust (trafilatura)
+- Filtrare: stopwords, URL-uri, numere
+- Contorizare unigrame și bigrame
 
-## Cerințe
-- Python 3.11+ (recomandat 3.12)
-- Windows/macOS/Linux
+### Layer 2 - Data Analysis
+- Statistici: frecvență absolută și relativă
+- Filtrare min_freq și medie
+- Tabel pandas cu rezultate
+- Identificare top 50% keywords semnificative
 
----
+### Layer 3 - Clustering & Insights
+- TF-IDF vectorization
+- KMeans clustering automat
+- Generare insights pe clustere
+- Identificare teme principale din keywords
 
-## Setup (Windows exemplu)
-
+## Instalare
 ```bash
-# 1) Clone
-git clone https://github.com/<user>/<repo>.git
-cd <repo>
-
-# 2) Venv
+git clone https://github.com/Radu1109/ro-keyword-miner.git
+cd ro-keyword-miner
 python -m venv .venv
-.\.venv\Scripts\activate
-
-# 3) Instalează dependențele
+.venv\Scripts\activate  # Windows
+source .venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
+```
 
-Dacă n-ai requirements.txt, generează-l din venv:
+## Setup
 
-pip freeze > requirements.txt
+Creează `.env`:
+```
+SERPER_API_KEY=your_key_here
+```
 
-Config (.env)
+## Utilizare
+```bash
+python main.py
+```
 
-Creează un fișier .env în rădăcina proiectului:
+Input:
+- Search phrase (ex: "Accidente rutiere în România")
+- Number of pages (1-5)
 
-SERPER_API_KEY=PASTE_CHEIA_TA_AICI
+Output:
+- Tabel cu keywords semnificative
+- Clustere automate cu labels
+- Insights despre teme principale
 
-Programul te întreabă:
+## Exemplu Output
+```
+Search: Climate changes in Romania
+Total keywords: 52
 
-Search: sintagma de căutat (ex. Accidente rutiere in Romania)
+Main themes detected:
+1. Climate & Climate Change (77 occurrences)
+2. Ecological Impacts (43 keywords)
+3. Conservation & Strategies (34 occurrences)
+```
 
-How many pages to search: nr. pagini Serper (ex. 2)
+## Structură Proiect
+```
+ro-keyword-miner/
+├── main.py              # Entry point
+├── functions.py         # Web scraping, text extraction
+├── analysis.py          # TF-IDF, KMeans clustering
+├── insights.py          # Generare insights
+├── config.py            # Parametri
+├── requirements.txt     # Dependencies
+└── .env                 # API keys (ignorat)
+```
 
-După ce procesează, îți cere opțional un Specific word:
+## Dependencies
 
-un cuvânt (unigramă), ex. accidente
+- pandas
+- scikit-learn (TF-IDF, KMeans)
+- trafilatura (text extraction)
+- httpx (requests with retry)
+- python-dotenv (environment variables)
 
-două cuvinte (bigramă), ex. accidente rutiere
+## Roadmap
 
-Ce afișează
+- [ ] Database persistence (SQLite)
+- [ ] Stop words filtering avansat
+- [ ] Export rapoarte (CSV, JSON, HTML)
+- [ ] Trending analysis (time-series)
+- [ ] Sentiment analysis
+- [ ] Network graphs (co-occurrence)
+- [ ] Lemmatization (Romanian)
+- [ ] Comparative analysis
+- [ ] Web app (Streamlit)
 
-Top unigrame: cuvânt - count
+## Autor
 
-Top bigrame: cuvânt1 cuvânt2 - count
-
-Surse folosite: URL-urile de unde s-a extras text
-
-Exemplu de interogare:
-
-Specific word:
-accidente rutiere
-'accidente rutiere': 12
-
-Parametri interni / note utile
-
-Serper: results_num (5–10) și pages (max 5 recomandat pentru MVP)
-
-Retry & backoff: pe 429/5xx (0.8s, 1.6s, 3.2s)
-
-extract_main_text: prag minim ~500 caractere (ajustează după nevoie)
-
-text_filter: regex + STOPWORDS_RO (grupate pe categorii), păstrează doar [a-zăâîșț]+, len>=3
-
-Numărări:
-
-unigrame → Counter total
-
-bigrame → Counter din perechi consecutive după filtrare
-
-Interogare termen:
-
-1 cuvânt → din total_counter
-
-2 cuvinte → din bigram_counter[(w1, w2)]
-
-(pentru >2 cuvinte: poți implementa n-gram “on the fly” cu fereastră)
+Radu - Personal data science project
